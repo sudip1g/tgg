@@ -1,0 +1,359 @@
+#include <stdio.h>
+#include <conio.h>
+
+struct player
+{
+    char name;
+    int pos[6][7];
+    int win;
+};
+
+int commonPos[6][7];
+int start;
+struct player playerX, playerO;
+
+void check();//to check win status
+void pvp();//main game
+void how2play();//brief information about the game to the players
+void visuals();//print board like design each time it is called
+
+void main()//the main menu of the game
+{
+    system("color 4f");
+    char backconfirm;
+    //game start/stop prompt
+    first:
+    system("cls");
+    printf("\t\t\t\t\tHello!Welcome to Gravity game\n");
+    printf("\t\t\tChoose:\n");
+	printf("\t\t\t1. START\n");
+    printf("\t\t\t2. STOP\n");
+    printf("\t\t\t3. How to Play.\n");
+    scanf("%d",&start);
+    switch (start)
+    {
+        case 1:
+            pvp();
+            break;
+        case 2:
+            printf("Thank you!\n");
+            getch();
+            break;
+        case 3:
+            how2play();
+            q1://incase user inputs other than y/Y for confirmation.
+            printf("Do you want to go to main menu?\nPress Y/y to confirm.");
+            scanf("%c",&backconfirm);
+            getch();
+            if(backconfirm=='y'||backconfirm=='Y'){
+                goto first;
+            }
+            else{
+                printf("Invalid character.\nPress enter to continue");
+                getch();
+                goto q1;
+            }
+            break;
+        default:
+            system("cls");
+	
+            printf("Please input 1, 2 or 3.\nPress any key to continue.\n");
+            getch();
+            goto first;
+            break;
+    }
+}
+
+void pvp(){
+    int Noofmoves;//counter to declare draw
+    char endprompt;//take y/Y or n/N confirmation char from players for game end.
+    char samegame;//take y/Y or n/N confirmation char from players for same game.
+    game://to restart the game/start new game
+    switch(start)
+    {
+        case(1):
+           system("cls");
+		    
+            printf("\tEnter the name of user who will play as 'X': ");
+            scanf("%s",&playerX.name);
+            printf("\tEnter the name of user who will play as 'O': ");
+            scanf("%s",&playerO.name);
+            samegame1://in case players want to continue playing the same game 
+            Noofmoves=0;
+            do{ 
+                //var declarations
+                int i1=0,j1=0,i2=0,j2=0;
+                system("cls");
+                //display board
+                visuals();
+                printf("\n\t\t%s's turn\n",&playerX.name);//X's turn 
+                promptX://incase of invalid move
+                printf("\t\tEnter the row(1-6):");
+                scanf("%d",&i1);
+                printf("\t\tEnter the column(1-7):");
+                scanf("%d",&j1);
+                if(i1>6 || i1<1 || j1>7 || j1<1){
+                    printf("\nInvalid position. Please choose the value from the given range.\nPress any key to continue.\n");
+                    getch();
+                    goto promptX;
+                }
+                if(commonPos[i1][j1-1]==1 || i1==6){//gravity rule
+                    if (commonPos[i1-1][j1-1] == 0){//checking availability of pos.
+                        commonPos[i1-1][j1-1]=1;
+                        playerX.pos[i1-1][j1-1]=1;
+                        Noofmoves= Noofmoves+1;
+                    }
+                    else{
+                        printf("\nThe position is not empty.\n");
+                        printf("\nPlease any key to continue.\n");
+                        getch();
+                        goto promptX; 
+                    }
+                }
+                else{
+                    printf("\nInvalid position. The position below you is empty.\nPress any key to continue.\n");
+                    getch();
+                    goto promptX;
+                }
+                
+                check();//check if X won after that move
+                visuals();//display board and X's current move
+
+                if(playerX.win==1){//X win prompt
+                    printf("\n\t\t\t%s,you won the game.\n",&playerX.name);
+                    printf("\nWould you like to continue?\n");
+                    question1://incase of invalid char input
+                    printf("\nPlease enter Y/y for Yes and N/n for No.\n");
+                    scanf("%c",&endprompt);
+                    getch();
+                    if(endprompt=='Y' || endprompt =='y'){
+                        question2://incase of invalid char input
+                        printf("\nWould you like to continue the same game?\nY/y for yes N/n for No.\n");
+                        scanf("%s",&samegame);
+                        if(samegame=='Y' || samegame =='y'){
+                            goto samegame1;
+                        }
+                        else if(samegame=='N'|| samegame=='n'){
+                            goto game;
+                        }
+                        else{
+                            printf("\nInvalid character.\n");
+                            printf("\nPress any key to continue.\n");
+                            getch();
+                            goto question2;
+                        }
+                    }
+                    else if(endprompt=='N' || endprompt =='n'){
+                        goto end;//thank you message
+                    }
+                    else{
+                        printf("\nInvalid character.\n");
+                        printf("\nPress any key to continue.\n");
+                        getch();
+                        goto question1;
+                    }
+                }//X win prompt close
+                
+                system("cls");
+                visuals();
+
+                printf("\n\t\t%s's turn\n",&playerO.name);
+                promptO://incase of invalid move
+                printf("\t\tEnter the row(1-6):");
+                scanf("%d",&i2);
+                printf("\t\tEnter the column(1-7):");
+                scanf("%d",&j2);
+                if(i2>6 || i2<1 || j2>7 || j2<1){
+                    printf("\nInvalid position.\nPress any key to continue.\n");
+                    getch();
+                    goto promptO;
+                }
+                if(commonPos[i2][j2-1]==1 || i2==6){//gravity rule
+                    if (commonPos[i2-1][j2-1] == 0){//check pos. availability
+                        commonPos[i2-1][j2-1]=1;
+                        playerO.pos[i2-1][j2-1]=1;
+                        Noofmoves = Noofmoves +1;
+                    }
+                    else{
+                        printf("\nThe position is not empty.\n");
+                        printf("\nPlease any key to continue.\n");
+                        getch();
+                        goto promptO; 
+                    }
+                }
+                else{
+                    printf("\nInvalid position. The position below you is empty.\nPress any key to continue.\n");
+                    getch();
+                    goto promptO;
+                }
+                
+                check();//check if O won after that move
+                visuals();//display board with current O's move
+                
+                if(playerO.win==1){//playerO win prompt
+                    printf("\n\t\t\t\t%s,you won the game.\n",&playerO.name); 
+                    printf("\nWould you like to continue?\n");
+                    question5://incase of invalid char input 
+                    printf("\nPlease enter Y/y for Yes and N/n for No.\n");
+                    scanf("%c",&endprompt);
+                    getch();
+                    if(endprompt=='Y' || endprompt =='y'){
+                        question6://incase of invalid char input
+                        printf("\nWould you like to continue the same game?\nY/y for yes N/n for No.\n");
+                        scanf("%s",&samegame);
+                        if(samegame=='Y' || samegame =='y'){
+                            goto samegame1;
+                        }
+                        else if(samegame=='N'|| samegame=='n'){
+                            goto game;
+                        }
+                        else{
+                            printf("\nInvalid character.\n");
+                            printf("\nPress any key to continue.\n");
+                            getch();
+                            goto question6;
+                        }
+                    }
+                    else if(endprompt=='N' || endprompt == 'n'){
+                        goto end;//disp thank you
+                    }
+                    else{
+                        printf("\nInvalid character.\n");
+                        printf("\nPress any key to continue.\n");
+                        getch();
+                        goto question5;
+                    }
+                }//O win prompt close
+                
+                if(Noofmoves==48){//draw propmt
+                    printf("\n\n\t\tIts a Draw.\n");
+                    printf("Would you like to continue?\n");
+                    question3:
+                    printf("\nPlease enter Y/y for Yes and N/n for No.\n");
+                    getch();
+                    scanf("%c",&endprompt);
+                    if(endprompt=='Y' || endprompt =='y'){
+                        question4:
+                        printf("\nWould you like to continue the same game?\nY/y for yes N/n for No.\n");
+                        scanf("%s",&samegame);
+                        if(samegame=='Y' || samegame =='y'){
+                            goto samegame1;
+                        }
+                        else if(samegame=='N'|| samegame=='n'){
+                            goto game;
+                        }
+                        else{
+                            printf("\nInvalid character.\n");
+                            printf("\nPress any key to continue.\n");
+                            getch();
+                            goto question4;
+                        }
+                    }
+                    else if(endprompt=='N'|| endprompt=='n'){
+                        goto end;
+                    }
+                    else{
+                        printf("\nInvalid character.\n");
+                        printf("\nPress any key to continue.\n");
+                        getch();
+                        goto question3;
+                    }
+                }//draw prompt close
+
+            }while(playerX.win!=1 && playerO.win!=1);
+            break;
+        case(2):
+            end:
+            printf("\n\t\t\t\tThank you!\n");
+            getch();
+            break;   
+    }
+    getch();
+}//pvp close
+
+void how2play(){
+    printf("\t\t\t\t\t\tGravity\n");
+    printf("-How to Play\n");
+    printf("\tThis is a simple game where two players choose a sign to play and try to get 4 consecutive signs together.");
+    printf("\tThe signs provided in the game are a cross and a circle. The player choosing cross gets the first move.");
+    printf("\tThe first player to get four consecutive crosses or circles across, downwards or diagonally win the round.");
+    printf("\tAs the name of the game suggests the players are not allowed to place their signs randomly from the start.");
+    printf("\tThe players are restricted to place their signs from the bottom as placing anywhere else defies gravity.");
+    printf("\tWith a 6x7 board the gameplays get more interesting than the traditional 3x3 circles and crosses game.");
+    printf("\tThe players have to keep an eye on the potential consecutives the opponent player can get with each move they make.\n");
+    
+}
+
+void check(){
+    int i,j;
+    for(i=0;i<=5;i++){
+        for(j=0;j<=6;j++){
+            //downways win
+            if(i<=2){
+                if(playerX.pos[i][j]==1 && playerX.pos[i+1][j]==1 && playerX.pos[i+2][j]==1 && playerX.pos[i+3][j]==1 ){
+                    playerX.win=1;
+                }
+                if(playerO.pos[i][j]==1 && playerO.pos[i+1][j]==1 && playerO.pos[i+2][j]==1 && playerO.pos[i+3][j]==1 ){
+                    playerO.win=1;
+                }
+            }
+            //across win
+            if(j<=3){
+                if(playerX.pos[i][j]==1 && playerX.pos[i][j+1]==1 && playerX.pos[i][j+2]==1 && playerX.pos[i][j+3]==1 ){
+                    playerX.win=1;
+                }
+                if(playerO.pos[i][j]==1 && playerO.pos[i][j+1]==1 && playerO.pos[i][j+2]==1 && playerO.pos[i][j+3]==1 ){
+                    playerO.win=1;
+                }
+            }
+            //diagonal win
+            if(j<=4){//forward diagonal win
+                if(playerX.pos[i][j]==1 && playerX.pos[i+1][j+1]==1 && playerX.pos[i+2][j+2]==1 && playerX.pos[i+3][j+3]==1 ){
+                    playerX.win=1;
+                }
+                if(playerO.pos[i][j]==1 && playerO.pos[i+1][j+1]==1 && playerO.pos[i+2][j+2]==1 && playerO.pos[i+3][j+3]==1 ){
+                    playerO.win=1;
+                }
+            }
+            if(j>=4){//backward diagonal win
+                if(playerX.pos[i][j]==1 && playerX.pos[i-1][j-1]==1 && playerX.pos[i-2][j-2]==1 && playerX.pos[i-3][j-3]==1 ){
+                    playerX.win=1;
+                }
+                if(playerO.pos[i][j]==1 && playerO.pos[i-1][j-1]==1 && playerO.pos[i-2][j-2]==1 && playerO.pos[i-3][j-3]==1 ){
+                    playerO.win=1;
+                }
+            }
+        }//for j
+    }//for i
+}//check close
+
+void visuals()
+{
+	int i,j;
+	system("cls");
+	printf("\t 1\t 2\t 3\t 4\t 5\t 6\t 7");//column number
+	for(i=0;i<=5;i++)
+	{
+		printf("\n\t________________________________________________________");//hor line of board
+		printf("\n%d\t|\t|\t|\t|\t|\t|\t|\t|\n",i+1);//upper half vertical line of board for each row with row no.
+		//printf("\n\t\t%d\t",i);
+		for(j=0;j<=6;j++)
+		{
+			if(playerX.pos[i][j]==1 && commonPos[i][j]==1)
+			{
+				printf("\t| X  ");//lower half vertical line with X in case there is X's move
+			}
+			else if(playerO.pos[i][j]==1 && commonPos[i][j]==1)
+			{
+				printf("\t| O  ");//lower half verical line with O in case there is O's move
+			}
+			else
+			{
+                printf("\t|    ");//empty lower half vertical line
+				continue;
+			}
+		}
+        printf("   |");//closing lower half verical line
+	}
+	printf("\n\t---------------------------------------------------------\n");//end hor line of board
+}
